@@ -12,8 +12,9 @@
     <engine name="cordova" version=">=4.0.0" />
   </engines>
 
-  <dependency id="cordova-connectivity-monitor" />
-  <dependency id="cordova-play-services-version-adapter" />
+  <!-- dependency id="cordova-connectivity-monitor" / -->
+  <!-- dependency id="cordova-play-services-version-adapter" / -->
+  <dependency id="cordova-plugin-cocoapod-support"/>
 
   <js-module src="www/admob.js" name="AdMobAds">
     <clobbers target="window.admob" />
@@ -59,15 +60,26 @@
       </feature>
     </config-file>
 
+    <config-file target="*-Info.plist" parent="NSAppTransportSecurity">
+      <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+      </dict>
+    </config-file>
+
     <header-file src="src/ios/CDVAdMobAds.h" />
     <source-file src="src/ios/CDVAdMobAds.m" />
     <header-file src="src/ios/CDVAdMobAdsAdListener.h" />
     <source-file src="src/ios/CDVAdMobAdsAdListener.m" />
     <header-file src="src/ios/CDVAdMobAdsRewardedAdListener.h" />
     <source-file src="src/ios/CDVAdMobAdsRewardedAdListener.m" />
+    <header-file src="src/ios/AppFeelReachability.h" />
+    <source-file src="src/ios/AppFeelReachability.m" />
+    <!-- header-file src="src/ios/CDVAppFeelReachability.h" />
+    <source-file src="src/ios/CDVAppFeelReachability.m" / -->
 
     <!-- Google AdMob framework -->
-    <dependency id="cordova-libgoogleadmobads" url="https://github.com/appfeel/google-iosadmobads" commit="master"/>
+    <pod name="Google-Mobile-Ads-SDK" />
     
     <!--config-file target="*-Info.plist" parent="CFBundleURLTypes">
       <array>
