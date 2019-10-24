@@ -1,18 +1,35 @@
-*<p style="font-size: small;" align="right"><a style="color:#232323" color="#232323" href="http://appfeel.com">Made in Barcelona with <span color="#FCB">Love</span> and <span color="#BBCCFF">Code</span></a></p>*
+# Cordova Plugin AdMob (Ethical)
 
-Cordova AdMob plugin<br>[![License][license]][npm-url] [![NPM version][npm-version]][npm-url] [![NPM downloads][npm-downloads]][npm-url]
-====================
+## Why this fork?
 
-[npm-url]: https://www.npmjs.com/package/cordova-admob
+The original plugin hasn't been touched by the authors since 2016, but they
+still try to get a "2% donation" from all revenues of all apps that install
+it. This "donation scheme" is only mentioned very last in the original README
+file; a dark pattern hiding a quite questionable practice.
+
+Apart from getting rid of this, this forks aims at modernizing the plugin
+installation and add support to AdMob Mediation.
+
+Main changes:
+
+ - Use cocoapod for installing dependencies
+ - Disable the "donation scheme"
+
 [license]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
-[npm-version]: https://img.shields.io/npm/v/cordova-admob.svg?style=flat
-[npm-downloads]: https://img.shields.io/npm/dm/cordova-admob.svg?style=flat
+
+_Note_: I don't say the original authors don't deserve donations. I myself am
+the author of several cordova plugin and I'm glad when I receive back some
+donations for support of my work. I just say that asking for 2% all ad
+revenue is obviously a lot. The right thing is to be upfront about it and
+make it easy to disable (at least provide some instructions).
 
 ## It simply works :)
 Monetize your Cordova/Phonegap/XDK HTML5 hybrid apps and games with AdMob ads, **using latest Google AdMob SDK**.
-- Now available with Ionic Native too
-- Supports banner, interstitials and rewarded
-- Optional [Tappx](http://www.tappx.com/?h=dec334d63287772de859bdb4e977fce6) backfill
+
+ - Now available with Ionic Native too
+ - Supports banner, interstitials and rewarded
+ - Optional [Tappx](http://www.tappx.com/?h=dec334d63287772de859bdb4e977fce6)
+   backfill
 
 With this Cordova/Phonegap/XDK plugin you can show AdMob ads as easy as:
 
@@ -20,72 +37,49 @@ With this Cordova/Phonegap/XDK plugin you can show AdMob ads as easy as:
     admob.createBannerView({publisherId: "ca-app-pub-XXXXXXXXXXXXXXXX/BBBBBBBBBB"});
 ```
 
-![Integrate cordova admob plugin](https://github.com/appfeel/admob-google-cordova/wiki/demo/integrate-admob-cordova.gif)
-
----
 ## Plugin update (phonegap/cordova cli) ##
-
-`cordova-admob~4.1.15` and later are now updated to Firebase SDK (ios 7.13.1 and later, android managed by gradle)
 
 To update the plugin you should remove the plugin and add it again:
 
 ```
-$ cordova plugin rm cordova-admob
+$ cordova plugin rm cordova-open-admob
 $ npm cache clear
-$ cordova plugin add cordova-admob
+$ cordova plugin add cordova-open-admob
 ```
-
-Sometimes removing the plugin causes an error (it's been reported to cordova https://issues.apache.org/jira/browse/CB-12083). If that happens, remove first `cordova-libgoogleadmobads` manually:
-
-
-```
-$ rm plugins/cordova-libgoogleadmobads/ -rf
-$ cordova plugin rm cordova-admob
-$ npm cache clear
-$ cordova plugin add cordova-admob
-```
-
----
-## Testimonials ##
-
-* [Visual Scale Android](https://play.google.com/store/apps/details?id=com.appfeel.visualanalogscale), [Visual Scale iOS](https://itunes.apple.com/app/id940214847?mt=8), a free app to help doctors and physiotherapists in their daily work:
-
-> It was really easy to integrate, thanks.
-
-* [Military Quotes Android](https://play.google.com/store/apps/details?id=com.covernator.fb.military.quotes), an interesting free app for those interested in images and quotes from US Military.
-
-> It works like a charm. Test ads and real ads show up. Thanks so much for following up, awesome support.
-
-<br><br>
-**[Place your testimonial here](https://github.com/appfeel/admob-google-cordova/issues)**
-
 
 ---
 ## Platform SDK supported ##
 
-* iOS, using AdMob SDK for iOS, v7.13.1
-* Android, using latest Google Play Services for Android (managed by gradle)
-
+* iOS, using AdMob SDK for iOS.
 
 ---
-## Demo projects: ##
-- [Intel XDK](https://github.com/appfeel/admob-google-xdk)
-- [Cordova/PhoneGap CLI](https://github.com/appfeel/admob-google-demo)
-- [PhoneGap Build](https://github.com/appfeel/admob-phonegap-build-demo)
+## Mediation ###
+
+You can setup additional AdMob mediation adapters:
+
+#### Facebook for iOS
+
+Add this to your `config.xml`:
+
+```xml
+<pod name="GoogleMobileAdsMediationFacebook" />
+```
+
+Follow the instructions here: https://developers.google.com/admob/ios/mediation/facebook
 
 ---
 ## Quick start ##
 
 To install this plugin, follow the [Command-line Interface Guide](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html#The%20Command-line%20Interface). You can use one of the following command lines:
 
-* `cordova plugin add cordova-admob`
-* `cordova plugin add https://github.com/appfeel/admob-google-cordova.git`
+* `cordova plugin add cordova-open-admob`
+* `cordova plugin add https://github.com/j3k0/admob-google-cordova.git`
 
 
 To use in [Phonegap Build](https://build.phonegap.com), place the following tag in your `config.xml` file:
 
 ```xml
-<gap:plugin name="phonegap-admob" source="npm"/>
+<gap:plugin name="cordova-open-admob" source="npm"/>
 ```
 
 To start showing ads, place the following code in your `onDeviceReady` callback. Replace corresponding id's with yours:
@@ -260,21 +254,8 @@ Note that the admob ads are configured inside `onDeviceReady()`. This is because
 ```
 
 ---
-## Contributing ##
-You can use this cordova plugin for free. You can contribute to this project in many ways:
-
-* Testimonials of apps that are using this plugin gives your app free marketing and will be especially helpful. [Open an issue](https://github.com/appfeel/admob-google-cordova/issues).
-* Register to [tappx](http://www.tappx.com/?h=dec334d63287772de859bdb4e977fce6) by using this link: http://www.tappx.com/?h=dec334d63287772de859bdb4e977fce6. It is our Guess-Link and for each affiliate we will get 50k tappix (free exchange ads).
-* [Reporting issues](https://github.com/appfeel/admob-google-cordova/issues).
-* Patching and bug fixing, especially when submitted with test code. [Open a pull request](https://github.com/appfeel/admob-google-cordova/pulls).
-* Other enhancements.
-
-You can also support this project by sharing 2% Ad traffic (it's not mandatory: if you are unwilling to share, please fork and remove the donation code).
-
-Love the project? Wanna buy me a coffee (or a beer :D)? [Click here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ELWJTK68B9A54&item_name=AppFeel+admob+for+cordova&item_number=com%2eadmob%2egoogle)
-
----
 ## Screenshots ##
+
 #### iPhone:
 
 <img src="https://github.com/appfeel/admob-google-cordova/wiki/demo/iphone.png" border="10" alt="Phonegp Cordova admob plugin in iPhone" />
@@ -317,3 +298,5 @@ SOFTWARE.
 ## Credits ##
 
 * [appFeel](http://www.appfeel.com)
+* Contributors
+
