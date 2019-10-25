@@ -114,11 +114,6 @@ static BOOL showAppAdmob() {
 #pragma mark Cordova JS bridge
 
 - (void)pluginInitialize {
-    // TODO: If you are using mediation, you may wish to wait until the
-    // completion handler is called before loading ads, as this will ensure
-    // that all mediation adapters are initialized.
-    [[GADMobileAds sharedInstance] startWithCompletionHandler:nil];
-
     // These notifications are required for re-placing the ad on orientation
     // changes. Start listening for notifications here since we need to
     // translate the Smart Banner constants according to the orientation.
@@ -255,9 +250,14 @@ static BOOL showAppAdmob() {
         NSDictionary* options = [command argumentAtIndex:0 withDefault:[NSNull null]];
         [self __setOptions:options];
     }
-    
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+
+    // If you are using mediation, you may wish to wait until the
+    // completion handler is called before loading ads, as this will ensure
+    // that all mediation adapters are initialized.
+    [[GADMobileAds sharedInstance] startWithCompletionHandler:i^{
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }];
 }
 
 - (void)createBannerView:(CDVInvokedUrlCommand *)command {

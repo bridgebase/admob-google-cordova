@@ -76,6 +76,11 @@ admob.options = {
 
 /**
  * Initialize appfeel-cordova-admob plugin with options:
+ *
+ * If you are using mediation, you may wish to wait until the
+ * success callback is called before loading ads, as this will ensure
+ * that all mediation adapters are initialized.
+ *
  * @param {!Object}    options         AdMob options (use admob.options as template)
  * @param {function()} successCallback Callback on success
  * @param {function()} failureCallback Callback on fail
