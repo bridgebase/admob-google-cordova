@@ -24,6 +24,8 @@ donations for support of my work. I just say that asking for 2% all ad
 revenue is obviously a lot. The right thing is to be upfront about it and
 make it easy to disable (at least provide some instructions).
 
+**IMPORTANT**: the Android code hasn't been cleaned up yet! I'm focusing on iOS for now.
+
 ## It simply works
 
 Monetize your Cordova/Phonegap/XDK HTML5 hybrid apps and games with AdMob ads, **using latest Google AdMob SDK**.
