@@ -14,6 +14,7 @@ Main changes:
 
  - Use cocoapod for installing dependencies
  - Disable the "donation scheme"
+ - Remove dependencies over deprecated plugins
 
 [license]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
 
@@ -23,13 +24,13 @@ donations for support of my work. I just say that asking for 2% all ad
 revenue is obviously a lot. The right thing is to be upfront about it and
 make it easy to disable (at least provide some instructions).
 
-## It simply works :)
+## It simply works
+
 Monetize your Cordova/Phonegap/XDK HTML5 hybrid apps and games with AdMob ads, **using latest Google AdMob SDK**.
 
  - Now available with Ionic Native too
  - Supports banner, interstitials and rewarded
- - Optional [Tappx](http://www.tappx.com/?h=dec334d63287772de859bdb4e977fce6)
-   backfill
+ - Optional [Tappx](http://www.tappx.com/) backfill
 
 With this Cordova/Phonegap/XDK plugin you can show AdMob ads as easy as:
 
@@ -37,7 +38,7 @@ With this Cordova/Phonegap/XDK plugin you can show AdMob ads as easy as:
     admob.createBannerView({publisherId: "ca-app-pub-XXXXXXXXXXXXXXXX/BBBBBBBBBB"});
 ```
 
-## Plugin update (phonegap/cordova cli) ##
+## Plugin update (phonegap/cordova cli)
 
 To update the plugin you should remove the plugin and add it again:
 
@@ -47,13 +48,11 @@ $ npm cache clear
 $ cordova plugin add cordova-open-admob
 ```
 
----
-## Platform SDK supported ##
+## Platform SDK supported
 
-* iOS, using AdMob SDK for iOS.
+ - iOS, using AdMob SDK for iOS.
 
----
-## Mediation ###
+## Mediation
 
 You can setup additional AdMob mediation adapters:
 
@@ -67,14 +66,12 @@ Add this to your `config.xml`:
 
 Follow the instructions here: https://developers.google.com/admob/ios/mediation/facebook
 
----
 ## Quick start ##
 
 To install this plugin, follow the [Command-line Interface Guide](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html#The%20Command-line%20Interface). You can use one of the following command lines:
 
 * `cordova plugin add cordova-open-admob`
 * `cordova plugin add https://github.com/j3k0/admob-google-cordova.git`
-
 
 To use in [Phonegap Build](https://build.phonegap.com), place the following tag in your `config.xml` file:
 
@@ -84,7 +81,7 @@ To use in [Phonegap Build](https://build.phonegap.com), place the following tag 
 
 To start showing ads, place the following code in your `onDeviceReady` callback. Replace corresponding id's with yours:
 
-*Note: ensure you have a proper [AdMob](https://apps.admob.com/admob/signup) and [tappx](http://www.tappx.com/?h=dec334d63287772de859bdb4e977fce6) accounts and get your publisher id's*.
+*Note: ensure you have a proper [AdMob](https://apps.admob.com/admob/signup) and [tappx](http://www.tappx.com/) accounts and get your publisher id's*.
 
 ```javascript
     
