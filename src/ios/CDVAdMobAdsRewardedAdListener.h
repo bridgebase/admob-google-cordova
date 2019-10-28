@@ -36,9 +36,8 @@
 }
 
 @property (nonatomic, retain) CDVAdMobAds *adMobAds;
-@property (assign) BOOL isBackFill;
 
-- (instancetype)initWithAdMobAds: (CDVAdMobAds *)originalAdMobAds andIsBackFill: (BOOL)andIsBackFill;
+- (instancetype)initWithAdMobAds: (CDVAdMobAds *)originalAdMobAds;
 - (void)rewardBasedVideoAdDidFailedToShow:(GADRewardBasedVideoAd *) rewarded;
 
 @end

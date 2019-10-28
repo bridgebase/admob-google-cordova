@@ -36,13 +36,11 @@
 @implementation CDVAdMobAdsAdListener
 
 @synthesize adMobAds;
-@synthesize isBackFill;
 
-- (instancetype)initWithAdMobAds: (CDVAdMobAds *)originalAdMobAds andIsBackFill: (BOOL)andIsBackFill {
+- (instancetype)initWithAdMobAds: (CDVAdMobAds *)originalAdMobAds {
     self = [super init];
     if (self) {
         adMobAds = originalAdMobAds;
-        isBackFill = andIsBackFill;
     }
     return self;
 }
@@ -63,19 +61,15 @@
     NSLog(@"%s: Failed to receive ad with error: %@",
           __PRETTY_FUNCTION__, [error localizedFailureReason]);
     
-    if (isBackFill) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            // Since we're passing error back through Cordova, we need to set this up.
-            NSString *jsString =
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        // Since we're passing error back through Cordova, we need to set this up.
+        NSString *jsString =
             @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
             @"{ 'adType' : 'banner', 'error': %ld, 'reason': '%@' }); }, 1);";
-            [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
-                                              (long)error.code,
-                                              [self __getErrorReason:error.code]]];
-        }];
-    } else {
-        [adMobAds tryToBackfillBannerAd];
-    }
+        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+                                          (long)error.code,
+                                          [self __getErrorReason:error.code]]];
+    }];
 }
 
 - (void)adViewDidFailedToShow:(GADBannerView *)view {
@@ -146,20 +140,15 @@
     NSLog(@"%s: Failed to receive ad with error: %@",
           __PRETTY_FUNCTION__, [error localizedFailureReason]);
 
-    if (isBackFill) {
-        adMobAds.isInterstitialAvailable = false;
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            NSString *jsString =
-            @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
-            @"{ 'adType' : 'interstitial', 'error': %ld, 'reason': '%@' }); }, 1);";
-            [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
-                                              (long)error.code,
-                                              [self __getErrorReason:error.code]]];
-        }];
-        
-    } else {
-        [adMobAds tryToBackfillInterstitialAd];
-    }
+    adMobAds.isInterstitialAvailable = false;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        NSString *jsString =
+        @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
+        @"{ 'adType' : 'interstitial', 'error': %ld, 'reason': '%@' }); }, 1);";
+        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+                                          (long)error.code,
+                                          [self __getErrorReason:error.code]]];
+    }];
 }
 
 // Sent just before presenting an interstitial.  After this method finishes the
