@@ -211,7 +211,6 @@ static BOOL showAppAdmob() {
 }
 
 - (void)setOptions:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
     NSString *callbackId = command.callbackId;
     NSArray* args = command.arguments;
     
@@ -224,8 +223,10 @@ static BOOL showAppAdmob() {
     // If you are using mediation, you may wish to wait until the
     // completion handler is called before loading ads, as this will ensure
     // that all mediation adapters are initialized.
-    [[GADMobileAds sharedInstance] startWithCompletionHandler:i^{
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    NSLog(@"GADMobileAds: Starting\n");
+    [[GADMobileAds sharedInstance] startWithCompletionHandler:^(GADInitializationStatus *status){
+        NSLog(@"GADMobileAds: Start Completed: %@\n", status.adapterStatusesByClassName);
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }];
 }

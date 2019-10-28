@@ -51,7 +51,10 @@
 // onAdLoaded
 - (void)adViewDidReceiveAd:(GADBannerView *)adView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'banner' }); }, 1);"];
+        NSString *jsString = [NSString stringWithFormat:
+            @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'banner', 'adapter' : '%@' }); }, 1);",
+            adView.adNetworkClassName];
+        [adMobAds.commandDelegate evalJs:jsString];
     }];
     [adMobAds onBannerAd:adView adListener:self];
 }
@@ -116,7 +119,10 @@
     if (adMobAds.interstitialView) {
         [adMobAds onInterstitialAd:interstitial adListener:self];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'interstitial' }); }, 1);"];
+            NSString *jsString = [NSString stringWithFormat:
+              @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'interstitial', 'adapter' : '%@' }); }, 1);",
+              interstitial.adNetworkClassName];
+            [adMobAds.commandDelegate evalJs:jsString];
         }];
     }
 }
