@@ -24,10 +24,16 @@
  SOFTWARE.
  */
 
+#define ADMOB_MEDIATION_MOPUB 1
+
 #import <AdSupport/ASIdentifierManager.h>
 #import <CommonCrypto/CommonDigest.h>
 #import "CDVAdMobAds.h"
 #import "MainViewController.h"
+
+#if ADMOB_MEDIATION_MOPUB
+#import <MoPub.h>
+#endif
 
 static BOOL showAppAdmob() {
   return YES;
@@ -86,6 +92,7 @@ static BOOL showAppAdmob() {
 #define OPT_AUTO_SHOW_BANNER        @"autoShowBanner"
 #define OPT_AUTO_SHOW_INTERSTITIAL  @"autoShowInterstitial"
 #define OPT_AUTO_SHOW_REWARDED      @"autoShowRewarded"
+#define OPT_MOPUB_AD_UNIT_ID        @"mopubAdUnitId"
 
 @synthesize isInterstitialAvailable;
 @synthesize isRewardedAvailable;
@@ -101,6 +108,7 @@ static BOOL showAppAdmob() {
 
 @synthesize isBannerVisible, isBannerInitialized, isBannerRequested, isInterstitialRequested, isRewardedRequested, isNetworkActive;
 @synthesize isBannerShow, isBannerAutoShow, isInterstitialAutoShow, isRewardedAutoShow;
+@synthesize mopubAdUnitId;
 
 #pragma mark Cordova JS bridge
 
@@ -224,11 +232,25 @@ static BOOL showAppAdmob() {
     // completion handler is called before loading ads, as this will ensure
     // that all mediation adapters are initialized.
     NSLog(@"GADMobileAds: Starting\n");
-    [[GADMobileAds sharedInstance] startWithCompletionHandler:^(GADInitializationStatus *status){
-        NSLog(@"GADMobileAds: Start Completed: %@\n", status.adapterStatusesByClassName);
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+
+    [self initMoPubWithCompletion:^{
+        [[GADMobileAds sharedInstance] startWithCompletionHandler:^(GADInitializationStatus *status){
+            NSLog(@"GADMobileAds: Start Completed: %@\n", status.adapterStatusesByClassName);
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+        }];
     }];
+}
+
+- (void)initMoPubWithCompletion:(void(^_Nullable)(void))completionBlock {
+#if ADMOB_MEDIATION_MOPUB
+    MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
+      initWithAdUnitIdForAppInitialization:mopubAdUnitId];
+    // see https://developers.mopub.com/publishers/ios/initialize/
+    [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:completionBlock];
+#else
+    completionBlock();
+#endif
 }
 
 - (void)createBannerView:(CDVInvokedUrlCommand *)command {
@@ -570,6 +592,11 @@ static BOOL showAppAdmob() {
     str = [options objectForKey:OPT_AUTO_SHOW_REWARDED];
     if (str && ![str isEqual:[NSNull null]]) {
         isRewardedAutoShow = [str boolValue];
+    }
+
+    str = [options objectForKey:OPT_MOPUB_AD_UNIT_ID];
+    if (str && ![str isEqual:[NSNull null]]) {
+      mopubAdUnitId = str;
     }
 }
 

@@ -79,6 +79,7 @@
 @property (assign) BOOL isBannerAutoShow;
 @property (assign) BOOL isInterstitialAutoShow;
 @property (assign) BOOL isRewardedAutoShow;
+@property (nonatomic, retain) NSString *mopubAdUnitId;
 
 - (void)setOptions:(CDVInvokedUrlCommand *)command;
 

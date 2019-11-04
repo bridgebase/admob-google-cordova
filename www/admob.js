@@ -71,7 +71,8 @@ admob.options = {
   adExtras: {},
   autoShowBanner: true,
   autoShowInterstitial: true,
-  autoShowRewarded: true
+  autoShowRewarded: true,
+  mopubAdUnitId: '', // required for initializing mopub
 };
 
 /**
