@@ -25,6 +25,7 @@
  */
 
 #define ADMOB_MEDIATION_MOPUB 1
+#define ADMOB_MEDIATION_TEST_SUITE 0
 
 #import <AdSupport/ASIdentifierManager.h>
 #import <CommonCrypto/CommonDigest.h>
@@ -33,6 +34,10 @@
 
 #if ADMOB_MEDIATION_MOPUB
 #import <MoPub.h>
+#endif
+
+#if ADMOB_MEDIATION_TEST_SUITE
+#import <GoogleMobileAdsMediationTestSuite/GoogleMobileAdsMediationTestSuite.h>
 #endif
 
 static BOOL showAppAdmob() {
@@ -238,6 +243,10 @@ static BOOL showAppAdmob() {
             NSLog(@"GADMobileAds: Start Completed: %@\n", status.adapterStatusesByClassName);
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+
+#if ADMOB_MEDIATION_TEST_SUITE
+            [GoogleMobileAdsMediationTestSuite presentOnViewController:self.viewController delegate:nil];
+#endif
         }];
     }];
 }
