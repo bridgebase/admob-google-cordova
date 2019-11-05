@@ -68,6 +68,26 @@ Add this to your `config.xml`:
 
 Follow the instructions here: https://developers.google.com/admob/ios/mediation/facebook
 
+#### MoPub for iOS
+
+Add this to your `config.xml`:
+
+```xml
+<pod name="GoogleMobileAdsMediationMoPub" />
+```
+
+Add this to your call to `setOptions`:
+
+```js
+admob.setOptions({
+  ...
+  mopubAdUnitId: 'some-ad-unit',
+  ...
+});
+```
+
+Follow the instructions here: https://developers.google.com/admob/ios/mediation/mopub
+
 ## Quick start ##
 
 To install this plugin, follow the [Command-line Interface Guide](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html#The%20Command-line%20Interface). You can use one of the following command lines:
