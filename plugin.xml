@@ -14,7 +14,7 @@
 
   <!-- dependency id="cordova-connectivity-monitor" / -->
   <!-- dependency id="cordova-play-services-version-adapter" / -->
-  <dependency id="cordova-plugin-cocoapod-support"/>
+  <!-- dependency id="cordova-plugin-cocoapod-support"/ -->
 
   <js-module src="www/admob.js" name="AdMobAds">
     <clobbers target="window.admob" />
@@ -79,7 +79,14 @@
     <source-file src="src/ios/CDVAppFeelReachability.m" / -->
 
     <!-- Google AdMob framework -->
-    <pod name="Google-Mobile-Ads-SDK" />
+    <!-- pod name="Google-Mobile-Ads-SDK" /-->
+    <podspec>
+      <pods use-frameworks="true">
+        <pod name="Google-Mobile-Ads-SDK" />
+        <pod name="GoogleMobileAdsMediationMoPub" />
+        <pod name="GoogleMobileAdsMediationFacebook" />
+      </pods>
+    </podspec>
     
     <!--config-file target="*-Info.plist" parent="CFBundleURLTypes">
       <array>
