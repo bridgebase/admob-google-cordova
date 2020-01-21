@@ -81,6 +81,9 @@
     <!-- Google AdMob framework -->
     <!-- pod name="Google-Mobile-Ads-SDK" /-->
     <podspec>
+      <config>
+        <source url="https://github.com/CocoaPods/Specs.git"/>
+      </config>
       <pods use-frameworks="true">
         <pod name="Google-Mobile-Ads-SDK" />
         <pod name="GoogleMobileAdsMediationMoPub" />
