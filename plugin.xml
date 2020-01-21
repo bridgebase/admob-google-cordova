@@ -78,8 +78,7 @@
     <!-- header-file src="src/ios/CDVAppFeelReachability.h" />
     <source-file src="src/ios/CDVAppFeelReachability.m" / -->
 
-    <!-- Google AdMob framework -->
-    <!-- pod name="Google-Mobile-Ads-SDK" /-->
+    <!-- Frameworks -->
     <podspec>
       <config>
         <source url="https://github.com/CocoaPods/Specs.git"/>

@@ -24,7 +24,7 @@
  SOFTWARE.
  */
 
-#define ADMOB_MEDIATION_MOPUB 1
+#define ADMOB_MEDIATION_MOPUB 0
 #define ADMOB_MEDIATION_TEST_SUITE 0
 
 #import <AdSupport/ASIdentifierManager.h>
