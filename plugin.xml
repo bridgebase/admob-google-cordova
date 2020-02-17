@@ -49,6 +49,8 @@
     <source-file src="src/android/AdMobAds.java" target-dir="src/cc/fovea/admob" />
     <source-file src="src/android/AdMobAdsAdListener.java" target-dir="src/cc/fovea/admob" />
     <source-file src="src/android/AdMobAdsRewardedAdListener.java" target-dir="src/cc/fovea/admob" />
+    <source-file src="src/android/Connectivity.java" target-dir="src/cc/fovea/admob" />
+    <source-file src="src/android/CPConnectivity.java" target-dir="src/cc/fovea/admob" />
     <source-file src="src/android/res/xml/admob.xml" target-dir="res/xml" />
   </platform>
 
