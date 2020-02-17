@@ -54,6 +54,8 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import cc.fovea.admob.Connectivity.IConnectivityChange;
+
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -64,7 +66,7 @@ import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.AdLoader;
 
 public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
-    public static final String ADMOBADS_LOGTAG = "AdmMobAds";
+    public static final String ADMOBADS_LOGTAG = "OpenAdMob";
     public static final String INTERSTITIAL = "interstitial";
     public static final String BANNER = "banner";
     public static final String REWARDED = "rewarded";
@@ -160,6 +162,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+        Log.i(ADMOBADS_LOGTAG, "initialize");
         connectivity = Connectivity.GetInstance(cordova.getActivity(), this);
         connectivity.observeInternetConnection();
     }
@@ -181,6 +184,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         PluginResult result = null;
+        Log.i(ADMOBADS_LOGTAG, "execute: " + action);
 
         if (ACTION_SET_OPTIONS.equals(action)) {
             JSONObject options = args.optJSONObject(0);
@@ -210,7 +214,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         } else if (ACTION_SHOW_REWARDED_AD.equals(action)) {
             result = executeShowRewardedAd(callbackContext);
         } else {
-            Log.d(ADMOBADS_LOGTAG, String.format("Invalid action passed: %s", action));
+            Log.i(ADMOBADS_LOGTAG, String.format("Invalid action passed: %s", action));
             return false;
         }
 
@@ -588,7 +592,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     }
 
     private PluginResult executeDestroyBannerView(CallbackContext callbackContext) {
-        Log.w(ADMOBADS_LOGTAG, "executeDestroyBannerView");
+        Log.i(ADMOBADS_LOGTAG, "executeDestroyBannerView");
         final CallbackContext delayCallback = callbackContext;
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override

@@ -25,6 +25,10 @@
  */
 var admob = window.admob || {};
 
+admob.log = function(txt) {
+  console.log('[admob]', txt);
+};
+
 /**
  * This enum represents appfeel-cordova-admob plugin events
  */
@@ -87,6 +91,7 @@ admob.options = {
  * @param {function()} failureCallback Callback on fail
  */
 admob.setOptions = function (options, successCallback, failureCallback) {
+  admob.log('setOptions', 'options', typeof options);
   if (typeof options === 'function') {
     failureCallback = successCallback;
     successCallback = options;
@@ -94,10 +99,10 @@ admob.setOptions = function (options, successCallback, failureCallback) {
   }
 
   options = options || admob.DEFAULT_OPTIONS;
+  admob.log('setOptions', 'publisherId', typeof options.publisherId, options.publisherId);
 
   if (typeof options === 'object' && typeof options.publisherId === 'string' && options.publisherId.length > 0) {
     cordova.exec(successCallback, failureCallback, 'AdMobAds', 'setOptions', [options]);
-
   } else {
     if (typeof failureCallback === 'function') {
       failureCallback('options.publisherId should be specified.');

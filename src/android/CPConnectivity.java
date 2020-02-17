@@ -37,10 +37,10 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.appfeel.cordova.connectivity.Connectivity.IConnectivityChange;
+import cc.fovea.admob.Connectivity.IConnectivityChange;
 
 public class CPConnectivity extends CordovaPlugin implements IConnectivityChange {
-  public static final String CONNECTIVITY_LOGTAG = "AppFeel-Connectivity";
+  public static final String CONNECTIVITY_LOGTAG = "OpenAdMob";
 
   /* Cordova Actions. */
   private static final String ACTION_OBSERVE_REMOTE_HOSTNAME = "observeRemoteHostName";
