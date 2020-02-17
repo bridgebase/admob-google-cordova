@@ -102,6 +102,7 @@ admob.setOptions = function (options, successCallback, failureCallback) {
   admob.log('setOptions', 'publisherId', typeof options.publisherId, options.publisherId);
 
   if (typeof options === 'object' && typeof options.publisherId === 'string' && options.publisherId.length > 0) {
+    admob.log('cordova.exec setOptions', successCallback, failureCallback);
     cordova.exec(successCallback, failureCallback, 'AdMobAds', 'setOptions', [options]);
   } else {
     if (typeof failureCallback === 'function') {
@@ -215,4 +216,3 @@ if (typeof module !== 'undefined') {
 }
 
 window.admob = admob;
-window.tappx = admob;

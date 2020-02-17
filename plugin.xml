@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-open-admob" version="0.4.1">
-  <description>Google AdMob Ads plugin for Cordova, Phonegap, Ionic/Angular and Intel XDK. Monetize your app with one javascript line. Android SDK v7.5, iOS SDK v7.3.1. With support for tappx and auto-detect internet connection.</description>
-  <name>AdMob Google Ads + Tappx</name>
-  <author email="info@appfeel.com" href="https://github.com/appfeel/admob-google-cordova">AppFeel</author>
+  <description>Google AdMob Ads plugin for Cordova, Phonegap, Ionic/Angular and Intel XDK. Monetize your app with one javascript line. Android SDK v7.5, iOS SDK v7.3.1. Auto-detect internet connection.</description>
+  <name>AdMob Google Ads</name>
+  <author email="hoelt@fovea.cc" href="https://github.com/j3k0/admob-google-cordova">AppFeel</author>
   <license>MIT</license>
-  <keywords>ad,ads,admob,google,advertising,advertisment,publicity,earn,win,play,services,iad,flurry,monetization,money,appfeel,tappx</keywords>
-  <repo>https://github.com/appfeel/admob-google-cordova.git</repo>
-  <issue>https://github.com/appfeel/admob-google-cordova/issues</issue>
+  <keywords>ad,ads,admob,google,advertising,advertisment,publicity,earn,win,play,services,iad,flurry,monetization,money,appfeel</keywords>
+  <repo>https://github.com/j3k0/admob-google-cordova.git</repo>
+  <issue>https://github.com/j3k0/admob-google-cordova/issues</issue>
 
   <engines>
     <engine name="cordova" version=">=4.0.0" />
@@ -18,7 +18,6 @@
 
   <js-module src="www/admob.js" name="AdMobAds">
     <clobbers target="window.admob" />
-    <clobbers target="window.tappx" />
   </js-module>
 
   <hook type="after_plugin_add" src="scripts/100-prepare-admob-angular.js" />

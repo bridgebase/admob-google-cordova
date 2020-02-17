@@ -36,12 +36,10 @@ import com.google.android.gms.ads.AdRequest;
 public class AdMobAdsAdListener extends AdListener {
     private String adType = "";
     private AdMobAds admobAds;
-    private boolean isBackFill = false;
 
-    public AdMobAdsAdListener(String adType, AdMobAds admobAds, boolean isBackFill) {
+    public AdMobAdsAdListener(String adType, AdMobAds admobAds) {
         this.adType = adType;
         this.admobAds = admobAds;
-        this.isBackFill = isBackFill;
     }
 
     @Override
@@ -59,20 +57,16 @@ public class AdMobAdsAdListener extends AdListener {
 
     @Override
     public void onAdFailedToLoad(int errorCode) {
-        if (this.isBackFill) {
-            final int code = errorCode;
-            admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String reason = getErrorReason(code);
-                    Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": failed to load ad (" + reason + ")");
-                    String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, { 'adType': '%s', 'error': %d, 'reason': '%s' });", adType, code, reason);
-                    admobAds.webView.loadUrl(event);
-                }
-            });
-        } else {
-            admobAds.tryBackfill(adType);
-        }
+        final int code = errorCode;
+        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String reason = getErrorReason(code);
+                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": failed to load ad (" + reason + ")");
+                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, { 'adType': '%s', 'error': %d, 'reason': '%s' });", adType, code, reason);
+                admobAds.webView.loadUrl(event);
+            }
+        });
     }
 
     /**

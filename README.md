@@ -32,7 +32,6 @@ Monetize your Cordova/Phonegap/XDK HTML5 hybrid apps and games with AdMob ads, *
 
  - Now available with Ionic Native too
  - Supports banner, interstitials and rewarded
- - Optional [Tappx](http://www.tappx.com/) backfill
 
 With this Cordova/Phonegap/XDK plugin you can show AdMob ads as easy as:
 
@@ -103,7 +102,7 @@ To use in [Phonegap Build](https://build.phonegap.com), place the following tag 
 
 To start showing ads, place the following code in your `onDeviceReady` callback. Replace corresponding id's with yours:
 
-*Note: ensure you have a proper [AdMob](https://apps.admob.com/admob/signup) and [tappx](http://www.tappx.com/) accounts and get your publisher id's*.
+*Note: ensure you have a proper [AdMob](https://apps.admob.com/admob/signup) account and get your publisher id's*.
 
 ```javascript
     
@@ -117,9 +116,6 @@ To start showing ads, place the following code in your `onDeviceReady` callback.
         autoShowBanner:        true,                                      // Optional
         autoShowRInterstitial: false,                                     // Optional
         autoShowRewarded:      false,                                     // Optional
-        tappxIdiOS:            "/XXXXXXXXX/Pub-XXXX-iOS-IIII",            // Optional
-        tappxIdAndroid:        "/XXXXXXXXX/Pub-XXXX-Android-AAAA",        // Optional
-        tappxShare:            0.5                                        // Optional
       });
       
       // Start showing banners (atomatic when autoShowBanner is set to true)
@@ -135,8 +131,6 @@ To start showing ads, place the following code in your `onDeviceReady` callback.
     document.addEventListener("deviceready", onDeviceReady, false);
 ```
 
-If you don't specify tappxId, no tappx requests will be placed (even if you specify a tappxShare). [See Tappx configuration](https://github.com/appfeel/admob-google-cordova/wiki/Tappx-configuration) for more detailed info.
-
 :warning: Be sure to start ads on "deviceready" event otherwise, the plugin would not work.
 
 ---
@@ -150,7 +144,6 @@ Visit the [wiki](https://github.com/appfeel/admob-google-cordova/wiki) of Google
 * [Testimonials](https://github.com/appfeel/admob-google-cordova/wiki/Testimonials)
 * [Setup](https://github.com/appfeel/admob-google-cordova/wiki/Setup)
 * [Angular.js, Ionic apps](https://github.com/appfeel/admob-google-cordova/wiki/Angular.js,-Ionic-apps)
-* [Tappx configuration](https://github.com/appfeel/admob-google-cordova/wiki/Tappx-configuration)
 * [Javascript API](https://github.com/appfeel/admob-google-cordova/wiki/Javascript-API)
   * [setOptions](https://github.com/appfeel/admob-google-cordova/wiki/setOptions)
   * Banners
@@ -202,9 +195,6 @@ Note that the admob ads are configured inside `onDeviceReady()`. This is because
           autoShowBanner:       true,
           autoShowInterstitial: false,
           autoShowRewarded:     false,
-          tappxIdiOS:           "/XXXXXXXXX/Pub-XXXX-iOS-IIII",
-          tappxIdAndroid:       "/XXXXXXXXX/Pub-XXXX-Android-AAAA",
-          tappxShare:           0.5,
         });
 
         registerAdEvents();

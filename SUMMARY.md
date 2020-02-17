@@ -7,7 +7,6 @@
 * [Testimonials](https://github.com/appfeel/admob-google-cordova/wiki/Testimonials)
 * [Setup](https://github.com/appfeel/admob-google-cordova/wiki/Setup)
 * [Angular.js, Ionic apps](https://github.com/appfeel/admob-google-cordova/wiki/Angular.js,-Ionic-apps)
-* [Tappx configuration](https://github.com/appfeel/admob-google-cordova/wiki/Tappx-configuration)
 * [Javascript API](https://github.com/appfeel/admob-google-cordova/wiki/Javascript-API)
   * [setOptions](https://github.com/appfeel/admob-google-cordova/wiki/setOptions)
   * Banners

@@ -81,10 +81,6 @@ static BOOL showAppAdmob() {
 #define BANNER                      @"banner";
 #define REWARDED                    @"rewarded";
 
-#define DEFAULT_AD_PUBLISHER_ID                 @"INVALID"
-#define DEFAULT_INTERSTITIAL_PUBLISHER_ID       @"INVALID"
-#define DEFAULT_REWARDED_PUBLISHER_ID           @"INVALID"
-
 #define OPT_PUBLISHER_ID            @"publisherId"
 #define OPT_INTERSTITIAL_AD_ID      @"interstitialAdId"
 #define OPT_REWARDED_AD_ID          @"rewardedAdId"
