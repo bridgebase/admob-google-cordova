@@ -24,7 +24,7 @@
  SOFTWARE.
  */
 
-package com.appfeel.cordova.admob;
+package cc.fovea.admob;
 
 import android.annotation.SuppressLint;
 import android.util.Log;

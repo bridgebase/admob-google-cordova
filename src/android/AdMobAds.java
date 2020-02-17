@@ -24,7 +24,7 @@
  SOFTWARE.
  */
 
-package com.appfeel.cordova.admob;
+package cc.fovea.admob;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
