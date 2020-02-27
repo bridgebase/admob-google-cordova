@@ -62,6 +62,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.mediation.admob.AdMobExtras;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.AdLoader;
 
@@ -276,7 +278,12 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     private PluginResult executeSetOptions(JSONObject options, CallbackContext callbackContext) {
         Log.i(ADMOBADS_LOGTAG, "executeSetOptions");
         this.setOptions(options);
-        callbackContext.success();
+        MobileAds.initialize(cordova.getActivity(), new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                callbackContext.success();
+            }
+        });
         return null;
     }
 
