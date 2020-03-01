@@ -56,6 +56,7 @@ import android.widget.RelativeLayout;
 
 import cc.fovea.admob.Connectivity.IConnectivityChange;
 
+// import com.google.android.ads.mediationtestsuite.MediationTestSuite;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -282,6 +283,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
                 callbackContext.success();
+                // MediationTestSuite.launch(cordova.getActivity());
             }
         });
         return null;
