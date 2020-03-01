@@ -1,6 +1,6 @@
 {
   "name": "cordova-open-admob",
-  "version": "0.9.0",
+  "version": "1.0.0-facebook",
   "description": "Google AdMob Ads plugin for Cordova, Phonegap, Ionic/Angular and Intel XDK. Monetize your app with one javascript line. Android SDK v7.5, iOS SDK v7.3.1. Auto-detect internet connection.",
   "cordova": {
     "id": "cordova-open-admob",
