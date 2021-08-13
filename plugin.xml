@@ -93,7 +93,7 @@
         <source url="https://github.com/CocoaPods/Specs.git"/>
       </config>
       <pods use-frameworks="true">
-        <pod name="Google-Mobile-Ads-SDK" />
+        <pod name="Google-Mobile-Ads-SDK" spec="~> 7.69.0"/>
         <pod name="GoogleMobileAdsMediationMoPub" />
         <pod name="GoogleMobileAdsMediationFacebook" />
       </pods>
