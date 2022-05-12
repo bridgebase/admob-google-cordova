@@ -94,7 +94,6 @@
       </config>
       <pods use-frameworks="true">
         <pod name="Google-Mobile-Ads-SDK" spec="~> 7.69.0"/>
-        <pod name="GoogleMobileAdsMediationMoPub" />
         <pod name="GoogleMobileAdsMediationFacebook" />
       </pods>
     </podspec>
