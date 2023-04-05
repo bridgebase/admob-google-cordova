@@ -59,9 +59,9 @@ static BOOL showAppAdmob() {
 - (void) __setOptions:(NSDictionary*) options;
 - (BOOL) __createBanner:(NSString *)_pid;
 - (BOOL) __showBannerAd:(BOOL)show;
-- (BOOL) __createInterstitial:(NSString *)_iid;
+- (void) __createInterstitial:(NSString *)_iid;
 - (BOOL) __showInterstitial:(BOOL)show;
-- (BOOL) __createRewarded:(NSString *)_rid;
+- (void) __createRewarded:(NSString *)_rid;
 - (BOOL) __showRewarded:(BOOL)show;
 - (GADRequest*) __buildAdRequest;
 - (NSString*) __md5: (NSString*) s;
@@ -82,7 +82,7 @@ static BOOL showAppAdmob() {
 #define REWARDED                    @"rewarded";
 
 #define OPT_PUBLISHER_ID            @"publisherId"
-#define OPT_INTERSTITIAL_AD_ID      @"interstitialAdId"
+#define OPT_INTERSTITIAL_AD_ID      @"interstitialId"
 #define OPT_REWARDED_AD_ID          @"rewardedAdId"
 #define OPT_AD_SIZE                 @"adSize"
 #define OPT_BANNER_AT_TOP           @"bannerAtTop"
@@ -100,6 +100,7 @@ static BOOL showAppAdmob() {
 
 @synthesize bannerView;
 @synthesize interstitialView;
+@synthesize rewardedAdView;
 @synthesize adsListener;
 @synthesize rewardedAdsListener;
 
@@ -175,25 +176,24 @@ static BOOL showAppAdmob() {
         isNetworkActive = true;
         if (isBannerRequested) {
             [self.commandDelegate runInBackground:^{
-                [self __createBanner:publisherId];
+                [self __createBanner: self.publisherId];
             }];
         }
         
         if (isInterstitialRequested) {
             [self.commandDelegate runInBackground:^{
-                isInterstitialRequested = true;
+                self.isInterstitialRequested = true;
                 
-                if (!isInterstitialAvailable && interstitialView) {
-                    self.interstitialView.delegate = nil;
+                if (!self.isInterstitialAvailable && self.interstitialView) {
+                    self.interstitialView.fullScreenContentDelegate = nil;
                     self.interstitialView = nil;
                 }
                 
-                if (isInterstitialAvailable) {
-                    [adsListener interstitialDidReceiveAd:interstitialView];
-                    
+                if (self.isInterstitialAvailable) {
+                    [self.adsListener interstitialDidReceiveAd: self.interstitialView];
                 } else if (!self.interstitialView) {
-                    NSString *_pid = publisherId;
-                    NSString *_iid = interstitialAdId;
+                    NSString *_pid = self.publisherId;
+                    NSString *_iid = self.interstitialAdId;
                     [self __createInterstitial:_iid];
                 }
             }];
@@ -201,17 +201,17 @@ static BOOL showAppAdmob() {
 
         if (isRewardedRequested) {
             [self.commandDelegate runInBackground:^{
-                isRewardedRequested = true;
+                self.isRewardedRequested = true;
                 
-                if (!isRewardedAvailable && [GADRewardBasedVideoAd sharedInstance]) {
-                    [GADRewardBasedVideoAd sharedInstance].delegate = nil;
+                if (!self.isRewardedAvailable && self.rewardedAdView) {
+                    self.rewardedAdView.fullScreenContentDelegate = nil;
                 }
 
-                if (isRewardedAvailable) {
-                    [rewardedAdsListener rewardBasedVideoAdDidReceiveAd:[GADRewardBasedVideoAd sharedInstance]];
-                } else if (![GADRewardBasedVideoAd sharedInstance]) {
-                    NSString *_pid = publisherId;
-                    NSString *_rid = rewardedAdId;
+                if (self.isRewardedAvailable) {
+                    [self.rewardedAdsListener rewardBasedVideoAdDidReceiveAd: self.rewardedAdView];
+                } else if (!self.rewardedAdView) {
+                    NSString *_pid = self.publisherId;
+                    NSString *_rid = self.rewardedAdId;
                     [self __createRewarded:_rid];
                 }
             }];
@@ -270,15 +270,15 @@ static BOOL showAppAdmob() {
     
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        isBannerRequested = true;
-        NSString *_pid = publisherId;
+        self.isBannerRequested = true;
+        NSString *_pid = self.publisherId;
         
         if (![self __createBanner:_pid]) {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                              messageAsString:@"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."];
         }
         
-        isBannerShow = isBannerAutoShow;
+        self.isBannerShow = self.isBannerAutoShow;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }];
 }
@@ -297,7 +297,7 @@ static BOOL showAppAdmob() {
             });
         }
         
-        isBannerRequested = false;
+        self.isBannerRequested = false;
         // Call the success callback that was passed in through the javascript.
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
@@ -339,14 +339,13 @@ static BOOL showAppAdmob() {
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult;
         
-        if (!isInterstitialAvailable && interstitialView) {
-            self.interstitialView.delegate = nil;
+        if (!self.isInterstitialAvailable && self.interstitialView) {
+            self.interstitialView.fullScreenContentDelegate = nil;
             self.interstitialView = nil;
         }
         
         if (!self.interstitialView) {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"interstitialAd is null, call requestInterstitialAd first."];
-            
         } else {
             if (![self __showInterstitial:YES]) {
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."];
@@ -365,11 +364,11 @@ static BOOL showAppAdmob() {
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult;
         
-        if (!isRewardedAvailable && [GADRewardBasedVideoAd sharedInstance]) {
-            [GADRewardBasedVideoAd sharedInstance].delegate = nil;
+        if (!self.isRewardedAvailable && self.rewardedAdView) {
+            self.rewardedAdView.fullScreenContentDelegate = nil;
         }
         
-        if (![GADRewardBasedVideoAd sharedInstance]) {
+        if (!self.rewardedAdView) {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"rewardedAd is null, call requestRewardedAd first."];
         } else {
             if (![self __showRewarded:YES]) {
@@ -395,7 +394,7 @@ static BOOL showAppAdmob() {
     }
 }
 
-- (void)onInterstitialAd:(GADInterstitial *)interstitial adListener:(CDVAdMobAdsAdListener *)adListener {
+- (void)onInterstitialAd:(GADInterstitialAd *)interstitial adListener:(CDVAdMobAdsAdListener *)adListener {
     self.isInterstitialAvailable = true;
     if (self.isInterstitialAutoShow) {
         [self.commandDelegate runInBackground:^{
@@ -406,12 +405,12 @@ static BOOL showAppAdmob() {
     }
 }
 
-- (void)onRewardedAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd adListener:(CDVAdMobAdsRewardedAdListener *)adListener {
+- (void)onRewardedAd:(GADRewardedAd *)rewardBasedVideoAd adListener:(CDVAdMobAdsRewardedAdListener *)adListener {
     self.isRewardedAvailable = true;
     if (self.isRewardedAutoShow) {
         [self.commandDelegate runInBackground:^{
             if (![self __showRewarded:YES]) {
-                [adListener rewardBasedVideoAdDidFailedToShow:[GADRewardBasedVideoAd sharedInstance]];
+                [adListener rewardBasedVideoAdDidFailedToShow: self.rewardedAdView];
             }
         }];
     }
@@ -429,23 +428,12 @@ static BOOL showAppAdmob() {
     
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        isInterstitialRequested = true;
+        self.isInterstitialRequested = true;
         
-        if (!isInterstitialAvailable && interstitialView) {
-            self.interstitialView.delegate = nil;
-            self.interstitialView = nil;
-        }
-        
-        if (isInterstitialAvailable) {
-            [adsListener interstitialDidReceiveAd:interstitialView];
-            
-        } else if (!self.interstitialView) {
-            NSString *_pid = publisherId;
-            NSString *_iid = interstitialAdId;
-            
-            if (![self __createInterstitial:_iid]) {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."];
-            }
+        if (!self.isInterstitialAvailable) {
+            NSString *_pid = self.publisherId;
+            NSString *_iid = self.interstitialAdId;
+            [self __createInterstitial:_iid];
         }
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
@@ -464,17 +452,19 @@ static BOOL showAppAdmob() {
 
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        isRewardedRequested = true;
+        self.isRewardedRequested = true;
         
-        if (isRewardedAvailable) {
-            [rewardedAdsListener rewardBasedVideoAdDidReceiveAd:[GADRewardBasedVideoAd sharedInstance]];
+        if (self.isRewardedAvailable) {
+            [self.rewardedAdsListener rewardBasedVideoAdDidReceiveAd: self.rewardedAdView];
         } else {
-            NSString *_pid = publisherId;
-            NSString *_rid = rewardedAdId;
+            NSString *_pid = self.publisherId;
+            NSString *_rid = self.rewardedAdId;
+            [self __createRewarded:_rid];
             
-            if (![self __createRewarded:_rid]) {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."];
-            }
+            // Since rewarded ad will still be loading, this will return a misleading result
+//            if (!self.isRewardedAvailable) {
+//                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."];
+//            }
         }
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
@@ -484,16 +474,16 @@ static BOOL showAppAdmob() {
 
 - (GADAdSize)__adSizeFromString:(NSString *)string {
     if ([string isEqualToString:@"BANNER"]) {
-        return kGADAdSizeBanner;
+        return GADAdSizeBanner;
         
     } else if ([string isEqualToString:@"IAB_MRECT"]) {
-        return kGADAdSizeMediumRectangle;
+        return GADAdSizeMediumRectangle;
         
     } else if ([string isEqualToString:@"IAB_BANNER"]) {
-        return kGADAdSizeFullBanner;
+        return GADAdSizeFullBanner;
         
     } else if ([string isEqualToString:@"IAB_LEADERBOARD"]) {
-        return kGADAdSizeLeaderboard;
+        return GADAdSizeLeaderboard;
         
     } else if ([string isEqualToString:@"SMART_BANNER"]) {
         CGRect pr = self.webView.superview.bounds;
@@ -505,7 +495,7 @@ static BOOL showAppAdmob() {
         }
         
     } else {
-        return kGADAdSizeInvalid;
+        return GADAdSizeInvalid;
     }
 }
 
@@ -663,25 +653,26 @@ static BOOL showAppAdmob() {
         if (!am.advertisingTrackingEnabled) {
             return nil;
         }
-        
+
         // Make the request for a test ad. Put in an identifier for the simulator as
         // well as any devices you want to receive test ads.
         // @"02b0ce0fda9a1f681188ca40e7fa71e1"
         // @"9a6658d2afbc898171e38c6e8080e20de4e4dc42",
         // @"9A6658D2AFBC898171E38C6E8080E20DE4E4DC42",
         NSString *admobDeviceId = [[self __admobDeviceID] lowercaseString];
-        request.testDevices = [NSArray arrayWithObjects:
-                               admobDeviceId,
-                               kGADSimulatorID,
-                               nil];
+
+        GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = [NSArray arrayWithObjects:
+                            admobDeviceId,
+                            GADSimulatorID,
+                            nil];
     }
-    
+
     if (self.adExtras) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             GADExtras *extras = [[GADExtras alloc] init];
             NSMutableDictionary *modifiedExtrasDict =
             [[NSMutableDictionary alloc] initWithDictionary:self.adExtras];
-            
+
             [modifiedExtrasDict removeObjectForKey:@"cordova"];
             [modifiedExtrasDict setValue:@"1" forKey:@"cordova"];
             extras.additionalParameters = modifiedExtrasDict;
@@ -735,58 +726,50 @@ static BOOL showAppAdmob() {
     return succeeded;
 }
 
-- (BOOL) __createInterstitial:(NSString *)_iid {
-    BOOL succeeded = false;
-    
+- (void) __createInterstitial:(NSString *)_iid {
     // Clean up the old interstitial...
     if (self.interstitialView) {
-        self.interstitialView.delegate = nil;
+        self.interstitialView.fullScreenContentDelegate = nil;
         self.interstitialView = nil;
-    }
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        self.interstitialView = [[GADInterstitial alloc] initWithAdUnitID:_iid];
-    });
-    self.interstitialView.delegate = adsListener;
-    
-    GADRequest *request = [self __buildAdRequest];
-    if (!request) {
-        succeeded = false;
-        if (self.interstitialView) {
-            [self.interstitialView setDelegate:nil];
-            self.interstitialView = nil;
-        }
-        
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.interstitialView loadRequest:request];
-        });
-        succeeded = true;
         self.isInterstitialAvailable = false;
     }
     
-    
-    return succeeded;
+    GADRequest *request = [self __buildAdRequest];
+    if (request) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [GADInterstitialAd loadWithAdUnitID:_iid request:request completionHandler:^(GADInterstitialAd * _Nullable interstitialAd, NSError * _Nullable error) {
+                if (error == nil) {
+                    self.interstitialView = interstitialAd;
+                    self.interstitialView.fullScreenContentDelegate = self.adsListener;
+                    self.isInterstitialAvailable = true;
+                    [self.adsListener interstitialDidReceiveAd: self.interstitialView];
+                }
+            }];
+        });
+    }
 }
 
-- (BOOL) __createRewarded:(NSString *)_rid {
-    BOOL succeeded = false;
-    
-    [GADRewardBasedVideoAd sharedInstance].delegate = rewardedAdsListener;
-    
-    GADRequest *request = [self __buildAdRequest];
-    if (!request) {
-        succeeded = false;
-        [GADRewardBasedVideoAd sharedInstance].delegate = nil;
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[GADRewardBasedVideoAd sharedInstance] loadRequest:request withAdUnitID:_rid ];
-        });
-        succeeded = true;
+- (void) __createRewarded:(NSString *)_rid {
+    // Clean up the old rewarded ad...
+    if (self.rewardedAdView) {
+        self.rewardedAdView.fullScreenContentDelegate = nil;
+        self.rewardedAdView = nil;
         self.isRewardedAvailable = false;
     }
     
-    
-    return succeeded;
+    GADRequest *request = [self __buildAdRequest];
+    if (request) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [GADRewardedAd loadWithAdUnitID:_rid request:request completionHandler:^(GADRewardedAd * _Nullable rewardedAd, NSError * _Nullable error) {
+                if (error == nil) {
+                    self.rewardedAdView = rewardedAd;
+                    self.rewardedAdView.fullScreenContentDelegate = self.rewardedAdsListener;
+                    self.isRewardedAvailable = true;
+                    [self.rewardedAdsListener rewardBasedVideoAdDidReceiveAd: self.rewardedAdView];
+                }
+            }];
+        });
+    }
 }
 
 - (BOOL) __showInterstitial:(BOOL)show {
@@ -794,16 +777,17 @@ static BOOL showAppAdmob() {
     
     if (!self.interstitialView) {
         NSString *_iid = interstitialAdId;
-        succeeded = [self __createInterstitial:_iid];
+        [self __createInterstitial:_iid];
         isInterstitialRequested = true;
     } else {
         succeeded = true;
     }
     
-    if (self.interstitialView && self.interstitialView.isReady) {
+    if (self.interstitialView && self.isInterstitialAvailable) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.interstitialView presentFromRootViewController:self.viewController];
-            isInterstitialRequested = false;
+            self.isInterstitialRequested = false;
+            self.isInterstitialAvailable = false;
         });
     }
     
@@ -813,19 +797,21 @@ static BOOL showAppAdmob() {
 - (BOOL) __showRewarded:(BOOL)show {
     BOOL succeeded = false;
     
-    if (![GADRewardBasedVideoAd sharedInstance]) {
+    if (!rewardedAdView) {
         NSString *_rid = rewardedAdId;
-        succeeded = [self __createRewarded:_rid];
+        [self __createRewarded:_rid];
         isRewardedRequested = true;
     } else {
         succeeded = true;
     }
     
-    if ([GADRewardBasedVideoAd sharedInstance] && [[GADRewardBasedVideoAd sharedInstance] isReady]) {
+    if (rewardedAdView && isRewardedAvailable) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[GADRewardBasedVideoAd sharedInstance] presentFromRootViewController:self.viewController];
-            isRewardedRequested = false;
-            isRewardedAvailable = false;
+            [rewardedAdView presentFromRootViewController:self.viewController userDidEarnRewardHandler:^{
+                
+            }];
+            self.isRewardedRequested = false;
+            self.isRewardedAvailable = false;
         });
     }
     
@@ -957,8 +943,10 @@ static BOOL showAppAdmob() {
     
     bannerView.delegate = nil;
     bannerView = nil;
-    interstitialView.delegate = nil;
+    interstitialView.fullScreenContentDelegate = nil;
     interstitialView = nil;
+    rewardedAdView.fullScreenContentDelegate = nil;
+    rewardedAdView = nil;
     
     adsListener = nil;
     rewardedAdsListener = nil;

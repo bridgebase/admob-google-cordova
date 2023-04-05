@@ -46,67 +46,67 @@
     return self;
 }
 
-- (void)rewardBasedVideoAdDidFailedToShow:(GADRewardBasedVideoAd *)rewarded {
+- (void)rewardBasedVideoAdDidFailedToShow:(GADRewardedAd *)rewarded {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
        NSString *jsString =
         @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
         @"{ 'adType' : 'rewarded', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
                                           0,
                                           @"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."]];
     }];
 }
 
-- (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didRewardUserWithReward:(GADAdReward *)reward {
+- (void)rewardBasedVideoAd:(GADRewardedAd *)rewardBasedVideoAd didRewardUserWithReward:(GADAdReward *)reward {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onRewardedAd, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onRewardedAd, { 'adType': 'rewarded' }); }, 1);"];
     }];
 }
 
-- (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardBasedVideoAdDidReceiveAd:(GADRewardedAd *)rewardBasedVideoAd {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType': 'rewarded' }); }, 1);"];
     }];
     [adMobAds onRewardedAd:rewardBasedVideoAd adListener:self];
 }
 
-- (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardBasedVideoAdDidOpen:(GADRewardedAd *)rewardBasedVideoAd {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType': 'rewarded' }); }, 1);"];
     }];
 }
 
-- (void)rewardBasedVideoAdDidStartPlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardBasedVideoAdDidStartPlaying:(GADRewardedAd *)rewardBasedVideoAd {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onRewardedAdVideoStarted, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onRewardedAdVideoStarted, { 'adType': 'rewarded' }); }, 1);"];
     }];
 }
 
-- (void)rewardBasedVideoAdDidCompletePlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardBasedVideoAdDidCompletePlaying:(GADRewardedAd *)rewardBasedVideoAd {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onRewardedAdVideoCompleted, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onRewardedAdVideoCompleted, { 'adType': 'rewarded' }); }, 1);"];
     }];
 }
 
-- (void)rewardBasedVideoAdDidClose:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardBasedVideoAdDidClose:(GADRewardedAd *)rewardBasedVideoAd {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType': 'rewarded' }); }, 1);"];
     }];
 }
 
-- (void)rewardBasedVideoAdWillLeaveApplication:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardBasedVideoAdWillLeaveApplication:(GADRewardedAd *)rewardBasedVideoAd {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLeftApplication, { 'adType': 'rewarded' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLeftApplication, { 'adType': 'rewarded' }); }, 1);"];
     }];
 }
 
-- (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
+- (void)rewardBasedVideoAd:(GADRewardedAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
     adMobAds.isRewardedAvailable = false;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         NSString *jsString =
             @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
             @"{ 'adType' : 'rewarded', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
                                           (long)error.code,
                                           [self __getErrorReason:error.code]]];
     }];
@@ -114,21 +114,21 @@
 
 - (NSString *) __getErrorReason:(NSInteger) errorCode {
     switch (errorCode) {
-        case kGADErrorServerError:
-        case kGADErrorOSVersionTooLow:
-        case kGADErrorTimeout:
+        case GADErrorServerError:
+        case GADErrorOSVersionTooLow:
+        case GADErrorTimeout:
             return @"Internal error";
             break;
             
-        case kGADErrorInvalidRequest:
+        case GADErrorInvalidRequest:
             return @"Invalid request";
             break;
             
-        case kGADErrorNetworkError:
+        case GADErrorNetworkError:
             return @"Network Error";
             break;
             
-        case kGADErrorNoFill:
+        case GADErrorNoFill:
             return @"No fill";
             break;
             

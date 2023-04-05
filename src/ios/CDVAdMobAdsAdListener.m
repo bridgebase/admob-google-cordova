@@ -52,15 +52,14 @@
 - (void)adViewDidReceiveAd:(GADBannerView *)adView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         NSString *jsString = [NSString stringWithFormat:
-            @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'banner', 'adapter' : '%@' }); }, 1);",
-            adView.adNetworkClassName];
-        [adMobAds.commandDelegate evalJs:jsString];
+            @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'banner', 'adapter' : '%@' }); }, 1);", @"UNKNOWN"];
+        [self.adMobAds.commandDelegate evalJs:jsString];
     }];
     [adMobAds onBannerAd:adView adListener:self];
 }
 
 // onAdFailedToLoad
-- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error {
+- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(NSError *)error {
     NSLog(@"%s: Failed to receive ad with error: %@",
           __PRETTY_FUNCTION__, [error localizedFailureReason]);
     
@@ -69,7 +68,7 @@
         NSString *jsString =
             @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
             @"{ 'adType' : 'banner', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
                                           (long)error.code,
                                           [self __getErrorReason:error.code]]];
     }];
@@ -80,7 +79,7 @@
         NSString *jsString =
         @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
         @"{ 'adType' : 'banner', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
                                           0,
                                           @"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."]];
     }];
@@ -90,21 +89,21 @@
 // onAdOpened
 - (void)adViewWillPresentScreen:(GADBannerView *)adView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType' : 'banner' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType' : 'banner' }); }, 1);"];
     }];
 }
 
 // onAdLeftApplication
 - (void)adViewWillLeaveApplication:(GADBannerView *)adView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLeftApplication, { 'adType' : 'banner' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLeftApplication, { 'adType' : 'banner' }); }, 1);"];
     }];
 }
 
 // onAdClosed
 - (void)adViewDidDismissScreen:(GADBannerView *)adView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType' : 'banner' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType' : 'banner' }); }, 1);"];
     }];
 }
 
@@ -115,24 +114,23 @@
 // transition point in your application such as when transitioning between view
 // controllers.
 // onAdLoaded
-- (void)interstitialDidReceiveAd:(GADInterstitial *)interstitial {
+- (void)interstitialDidReceiveAd:(GADInterstitialAd *)interstitial {
     if (adMobAds.interstitialView) {
         [adMobAds onInterstitialAd:interstitial adListener:self];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             NSString *jsString = [NSString stringWithFormat:
-              @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'interstitial', 'adapter' : '%@' }); }, 1);",
-              interstitial.adNetworkClassName];
-            [adMobAds.commandDelegate evalJs:jsString];
+              @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'interstitial', 'adapter' : '%@' }); }, 1);", @"UNKNOWN"];
+            [self.adMobAds.commandDelegate evalJs:jsString];
         }];
     }
 }
 
-- (void)interstitialDidFailedToShow:(GADInterstitial *) interstitial {
+- (void)interstitialDidFailedToShow:(GADInterstitialAd *) interstitial {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         NSString *jsString =
         @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
         @"{ 'adType' : 'interstitial', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
                                           0,
                                           @"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."]];
     }];
@@ -142,7 +140,7 @@
 // Sent when an interstitial ad request completed without an interstitial to
 // show.  This is common since interstitials are shown sparingly to users.
 // onAdFailedToLoad
-- (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
+- (void)interstitial:(GADInterstitialAd *)ad didFailToReceiveAdWithError:(NSError *)error {
     NSLog(@"%s: Failed to receive ad with error: %@",
           __PRETTY_FUNCTION__, [error localizedFailureReason]);
 
@@ -151,7 +149,7 @@
         NSString *jsString =
         @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
         @"{ 'adType' : 'interstitial', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
                                           (long)error.code,
                                           [self __getErrorReason:error.code]]];
     }];
@@ -163,10 +161,10 @@
 // while the interstitial is on screen (e.g. to visit the App Store from a link
 // on the interstitial).
 // onAdOpened
-- (void)interstitialWillPresentScreen:(GADInterstitial *)interstitial {
+- (void)interstitialWillPresentScreen:(GADInterstitialAd *)interstitial {
     if (adMobAds.isInterstitialAvailable) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType' : 'interstitial' }); }, 1);"];
+            [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType' : 'interstitial' }); }, 1);"];
         }];
         adMobAds.isInterstitialAvailable = false;
     }
@@ -175,30 +173,30 @@
 // Sent just after dismissing an interstitial and it has animated off the
 // screen.
 // onAdClosed
-- (void)interstitialDidDismissScreen:(GADInterstitial *)interstitial {
+- (void)interstitialDidDismissScreen:(GADInterstitialAd *)interstitial {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType' : 'interstitial' }); }, 1);"];
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType' : 'interstitial' }); }, 1);"];
     }];
     adMobAds.isInterstitialAvailable = false;
 }
 
 - (NSString *) __getErrorReason:(NSInteger) errorCode {
     switch (errorCode) {
-        case kGADErrorServerError:
-        case kGADErrorOSVersionTooLow:
-        case kGADErrorTimeout:
+        case GADErrorServerError:
+        case GADErrorOSVersionTooLow:
+        case GADErrorTimeout:
             return @"Internal error";
             break;
             
-        case kGADErrorInvalidRequest:
+        case GADErrorInvalidRequest:
             return @"Invalid request";
             break;
             
-        case kGADErrorNetworkError:
+        case GADErrorNetworkError:
             return @"Network Error";
             break;
             
-        case kGADErrorNoFill:
+        case GADErrorNoFill:
             return @"No fill";
             break;
             
