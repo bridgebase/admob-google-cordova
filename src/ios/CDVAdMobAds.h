@@ -31,13 +31,9 @@
 #import <GoogleMobileAds/GADMobileAds.h>
 #import <GoogleMobileAds/GADAdSize.h>
 #import <GoogleMobileAds/GADBannerView.h>
-//#import <GoogleMobileAds/GADInterstitial.h>
 #import <GoogleMobileAds/GADInterstitialAd.h>
-//#import <GoogleMobileAds/GADRewardBasedVideoAd.h>
 #import <GoogleMobileAds/GADRewardedAd.h>
 #import <GoogleMobileAds/GADBannerViewDelegate.h>
-//#import <GoogleMobileAds/GADInterstitialDelegate.h>
-//#import <GoogleMobileAds/GADRewardBasedVideoAdDelegate.h>
 #import <GoogleMobileAds/GADFullScreenContentDelegate.h>
 #import "CDVAdMobAdsAdListener.h"
 #import "CDVAdMobAdsRewardedAdListener.h"

@@ -27,15 +27,12 @@
 #import <Foundation/Foundation.h>
 #import "CDVAdMobAds.h"
 #import <GoogleMobileAds/GADBannerViewDelegate.h>
-//#import <GoogleMobileAds/GADInterstitialDelegate.h>
 #import <GoogleMobileAds/GADFullScreenContentDelegate.h>
 #import <GoogleMobileAds/GADExtras.h>
 
 @class CDVAdMobAds;
 
-@interface CDVAdMobAdsAdListener : NSObject <GADBannerViewDelegate, GADFullScreenContentDelegate> {
-    
-}
+@interface CDVAdMobAdsAdListener : NSObject <GADBannerViewDelegate, GADFullScreenContentDelegate> {}
 
 @property (nonatomic, retain) CDVAdMobAds *adMobAds;
 
@@ -44,5 +41,5 @@
 - (void)adViewWillPresentScreen:(GADBannerView *)view;
 - (void)interstitialDidFailedToShow:(GADInterstitialAd *) interstitial;
 - (void)interstitialDidReceiveAd:(GADInterstitialAd *) interstitial;
-
+- (void)interstitial:(GADInterstitialAd *)ad didFailToReceiveAdWithError:(NSError *)error;
 @end

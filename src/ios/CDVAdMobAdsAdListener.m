@@ -180,6 +180,31 @@
     adMobAds.isInterstitialAvailable = false;
 }
 
+// Sent just before presenting an interstitial.  After this method finishes the
+// interstitial will animate onto the screen.  Use this opportunity to stop
+// animations and save the state of your application in case the user leaves
+// while the interstitial is on screen (e.g. to visit the App Store from a link
+// on the interstitial).
+// onAdOpened
+- (void)adWillPresentFullScreenContent:(id<GADFullScreenPresentingAd>)ad {
+    if (adMobAds.isInterstitialAvailable) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType' : 'interstitial' }); }, 1);"];
+        }];
+        adMobAds.isInterstitialAvailable = false;
+    }
+}
+
+// Sent just after dismissing an interstitial and it has animated off the
+// screen.
+// onAdClosed
+- (void)adDidDismissFullScreenContent:(id<GADFullScreenPresentingAd>)ad {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType' : 'interstitial' }); }, 1);"];
+    }];
+    adMobAds.isInterstitialAvailable = false;
+}
+
 - (NSString *) __getErrorReason:(NSInteger) errorCode {
     switch (errorCode) {
         case GADErrorServerError:

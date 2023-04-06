@@ -112,6 +112,29 @@
     }];
 }
 
+- (void)adWillPresentFullScreenContent:(id<GADFullScreenPresentingAd>)ad {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType': 'rewarded' }); }, 1);"];
+    }];
+}
+
+- (void)adDidDismissFullScreenContent:(id<GADFullScreenPresentingAd>)ad {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.adMobAds.commandDelegate evalJs:@"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdClosed, { 'adType': 'rewarded' }); }, 1);"];
+    }];
+}
+
+- (void)ad:(id<GADFullScreenPresentingAd>)ad didFailToPresentFullScreenContentWithError:(NSError *)error {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+       NSString *jsString =
+        @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
+        @"{ 'adType' : 'rewarded', 'error': %ld, 'reason': '%@' }); }, 1);";
+        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
+                                          0,
+                                          @"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."]];
+    }];
+}
+
 - (NSString *) __getErrorReason:(NSInteger) errorCode {
     switch (errorCode) {
         case GADErrorServerError:

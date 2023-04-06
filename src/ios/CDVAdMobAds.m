@@ -366,6 +366,7 @@ static BOOL showAppAdmob() {
         
         if (!self.isRewardedAvailable && self.rewardedAdView) {
             self.rewardedAdView.fullScreenContentDelegate = nil;
+            self.rewardedAdView = nil;
         }
         
         if (!self.rewardedAdView) {
@@ -739,10 +740,14 @@ static BOOL showAppAdmob() {
         dispatch_async(dispatch_get_main_queue(), ^{
             [GADInterstitialAd loadWithAdUnitID:_iid request:request completionHandler:^(GADInterstitialAd * _Nullable interstitialAd, NSError * _Nullable error) {
                 if (error == nil) {
+                    // Interstitial loaded succesfully
                     self.interstitialView = interstitialAd;
                     self.interstitialView.fullScreenContentDelegate = self.adsListener;
                     self.isInterstitialAvailable = true;
                     [self.adsListener interstitialDidReceiveAd: self.interstitialView];
+                } else {
+                    // Interstitial failed to load
+                    [self.adsListener interstitial:interstitialAd didFailToReceiveAdWithError:error];
                 }
             }];
         });
@@ -762,10 +767,14 @@ static BOOL showAppAdmob() {
         dispatch_async(dispatch_get_main_queue(), ^{
             [GADRewardedAd loadWithAdUnitID:_rid request:request completionHandler:^(GADRewardedAd * _Nullable rewardedAd, NSError * _Nullable error) {
                 if (error == nil) {
+                    // Rewarded ad loaded successfully
                     self.rewardedAdView = rewardedAd;
                     self.rewardedAdView.fullScreenContentDelegate = self.rewardedAdsListener;
                     self.isRewardedAvailable = true;
                     [self.rewardedAdsListener rewardBasedVideoAdDidReceiveAd: self.rewardedAdView];
+                } else {
+                    // Rewarded ad failed to load
+                    [self.rewardedAdsListener rewardBasedVideoAd:rewardedAd didFailToLoadWithError:error];
                 }
             }];
         });
@@ -807,8 +816,9 @@ static BOOL showAppAdmob() {
     
     if (rewardedAdView && isRewardedAvailable) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [rewardedAdView presentFromRootViewController:self.viewController userDidEarnRewardHandler:^{
-                
+            [self.rewardedAdView presentFromRootViewController:self.viewController userDidEarnRewardHandler:^{
+                GADAdReward *reward = self.rewardedAdView.adReward;
+                [self.rewardedAdsListener rewardBasedVideoAd:self.rewardedAdView didRewardUserWithReward:reward];
             }];
             self.isRewardedRequested = false;
             self.isRewardedAvailable = false;

@@ -26,20 +26,18 @@
 
 #import <Foundation/Foundation.h>
 #import "CDVAdMobAds.h"
-//#import <GoogleMobileAds/GADRewardBasedVideoAdDelegate.h>
 #import <GoogleMobileAds/GADFullScreenContentDelegate.h>
 #import <GoogleMobileAds/GADExtras.h>
 
 @class CDVAdMobAds;
 
-@interface CDVAdMobAdsRewardedAdListener : NSObject <GADFullScreenContentDelegate> {
-    
-}
+@interface CDVAdMobAdsRewardedAdListener : NSObject <GADFullScreenContentDelegate> {}
 
 @property (nonatomic, retain) CDVAdMobAds *adMobAds;
 
 - (instancetype)initWithAdMobAds: (CDVAdMobAds *)originalAdMobAds;
 - (void)rewardBasedVideoAdDidFailedToShow:(GADRewardedAd *) rewarded;
 - (void)rewardBasedVideoAdDidReceiveAd:(GADRewardedAd *) rewarded;
-
+- (void)rewardBasedVideoAd:(GADRewardedAd *)rewarded didFailToLoadWithError:(NSError *)error;
+- (void)rewardBasedVideoAd:(GADRewardedAd *)rewarded didRewardUserWithReward:(GADAdReward *)reward;
 @end
