@@ -31,6 +31,7 @@ import android.util.Log;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
 
 @SuppressLint("DefaultLocale")
 public class AdMobAdsAdListener extends AdListener {
@@ -56,8 +57,8 @@ public class AdMobAdsAdListener extends AdListener {
     }
 
     @Override
-    public void onAdFailedToLoad(int errorCode) {
-        final int code = errorCode;
+    public void onAdFailedToLoad(LoadAdError loadAdError) {
+        final int code = loadAdError.getCode();
         admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -99,18 +100,6 @@ public class AdMobAdsAdListener extends AdListener {
             public void run() {
                 Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad opened");
                 String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType': '%s' });", adType);
-                admobAds.webView.loadUrl(event);
-            }
-        });
-    }
-
-    @Override
-    public void onAdLeftApplication() {
-        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": left application");
-                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdLeftApplication, { 'adType': '%s' });", adType);
                 admobAds.webView.loadUrl(event);
             }
         });

@@ -47,8 +47,8 @@
     </edit-config>
     <source-file src="src/android/res/xml/admob_network_security_config.xml" target-dir="res/xml" />
 
-    <framework src="com.google.android.gms:play-services-ads:18.3.0" />
-    <framework src="com.google.ads.mediation:facebook:5.7.0.0" />
+    <framework src="com.google.android.gms:play-services-ads:22.0.0" /> <!-- MARCH 2023 -->
+    <framework src="com.google.ads.mediation:facebook:6.13.7.0" /> <!-- MARCH 2023 -->
 
     <!-- mediation test suite -->
     <!-- framework src="com.google.android.ads:mediation-test-suite:1.3.0" / -->

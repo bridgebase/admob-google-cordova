@@ -30,11 +30,11 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
-import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardItem;
+
 
 @SuppressLint("DefaultLocale")
-public class AdMobAdsRewardedAdListener implements RewardedVideoAdListener {
+public class AdMobAdsRewardedAdListener {
 
     private String adType = "";
     private AdMobAds admobAds;
@@ -44,7 +44,6 @@ public class AdMobAdsRewardedAdListener implements RewardedVideoAdListener {
         this.admobAds = admobAds;
     }
 
-    @Override
     public void onRewarded(RewardItem reward) {
         admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -56,19 +55,6 @@ public class AdMobAdsRewardedAdListener implements RewardedVideoAdListener {
         });
     }
 
-    @Override
-    public void onRewardedVideoAdLeftApplication() {
-        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": left application");
-                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdLeftApplication, { 'adType': '%s' });", adType);
-                admobAds.webView.loadUrl(event);
-            }
-        });
-    }
-
-    @Override
     public void onRewardedVideoAdClosed() {
         admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -80,7 +66,6 @@ public class AdMobAdsRewardedAdListener implements RewardedVideoAdListener {
         });
     }
 
-    @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
         final int code = errorCode;
         admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -89,6 +74,30 @@ public class AdMobAdsRewardedAdListener implements RewardedVideoAdListener {
                 String reason = getErrorReason(code);
                 Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": failed to load ad (" + reason + ")");
                 String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, { 'adType': '%s', 'error': %d, 'reason': '%s' });", adType, code, reason);
+                admobAds.webView.loadUrl(event);
+            }
+        });
+    }
+
+    public void onRewardedVideoAdLoaded() {
+        admobAds.onAdLoaded(adType);
+        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad loaded");
+                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType': '%s' });", adType);
+                admobAds.webView.loadUrl(event);
+            }
+        });
+    }
+
+    public void onRewardedVideoAdOpened() {
+        admobAds.onAdOpened(adType);
+        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad opened");
+                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType': '%s' });", adType);
                 admobAds.webView.loadUrl(event);
             }
         });
@@ -115,55 +124,5 @@ public class AdMobAdsRewardedAdListener implements RewardedVideoAdListener {
         }
         return errorReason;
     }
-
-    @Override
-    public void onRewardedVideoAdLoaded() {
-        admobAds.onAdLoaded(adType);
-        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad loaded");
-                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType': '%s' });", adType);
-                admobAds.webView.loadUrl(event);
-            }
-        });
-    }
-
-    @Override
-    public void onRewardedVideoAdOpened() {
-        admobAds.onAdOpened(adType);
-        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad opened");
-                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onAdOpened, { 'adType': '%s' });", adType);
-                admobAds.webView.loadUrl(event);
-            }
-        });
-    }
-
-    @Override
-    public void onRewardedVideoStarted() {
-        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad video started");
-                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onRewardedAdVideoStarted, { 'adType': '%s' });", adType);
-                admobAds.webView.loadUrl(event);
-            }
-        });
-    }
-
-    @Override
-    public void onRewardedVideoCompleted() {
-        admobAds.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(AdMobAds.ADMOBADS_LOGTAG, adType + ": ad video completed");
-                String event = String.format("javascript:cordova.fireDocumentEvent(admob.events.onRewardedAdVideoCompleted, { 'adType': '%s' });", adType);
-                admobAds.webView.loadUrl(event);
-            }
-        });
-    }
-
+    
 }

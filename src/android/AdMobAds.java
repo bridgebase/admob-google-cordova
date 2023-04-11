@@ -28,6 +28,7 @@ package cc.fovea.admob;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -54,19 +55,28 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
+
 import cc.fovea.admob.Connectivity.IConnectivityChange;
 
 // import com.google.android.ads.mediationtestsuite.MediationTestSuite;
+import com.google.ads.mediation.admob.AdMobAdapter;
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.mediation.admob.AdMobExtras;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 
 public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     public static final String ADMOBADS_LOGTAG = "OpenAdMob";
@@ -88,7 +98,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
 
     /* options */
     private static final String OPT_PUBLISHER_ID = "publisherId";
-    private static final String OPT_INTERSTITIAL_AD_ID = "interstitialAdId";
+    private static final String OPT_INTERSTITIAL_AD_ID = "interstitialId";
     private static final String OPT_REWARDED_AD_ID = "rewardedAdId";
     private static final String OPT_AD_SIZE = "adSize";
     private static final String OPT_BANNER_AT_TOP = "bannerAtTop";
@@ -134,7 +144,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     /**
      * The rewarded ad to display to the user.
      */
-    private RewardedVideoAd rewardedAd;
+    private RewardedAd rewardedAd;
     /**
      * Whether or not the ad should be positioned at top or bottom of screen.
      */
@@ -338,9 +348,10 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         if (isTesting) {
             // This will request test ads on the emulator and deviceby passing this hashed device ID.
             String ANDROID_ID = Settings.Secure.getString(cordova.getActivity().getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-            String deviceId = md5(ANDROID_ID).toUpperCase();
-            request_builder = request_builder.addTestDevice(deviceId).addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+            RequestConfiguration configuration = new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList(AdRequest.DEVICE_ID_EMULATOR)).build();
+            MobileAds.setRequestConfiguration(configuration);
         }
+
         Bundle bundle = new Bundle();
         bundle.putInt("cordova", 1);
         if (adExtras != null) {
@@ -354,8 +365,8 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
                 }
             }
         }
-        AdMobExtras adextras = new AdMobExtras(bundle);
-        request_builder = request_builder.addNetworkExtras(adextras);
+
+        request_builder = request_builder.addNetworkExtrasBundle(AdMobAdapter.class, bundle);
         AdRequest request = request_builder.build();
         return request;
     }
@@ -421,6 +432,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
                     // no change
 
                 } else if (show) {
+                    Log.i(ADMOBADS_LOGTAG, "show " + show);
                     if (adView.getParent() != null) {
                         ((ViewGroup) adView.getParent()).removeView(adView);
                     }
@@ -516,7 +528,6 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     }
 
     private PluginResult executeDestroyBannerView(CallbackContext callbackContext) {
-        Log.i(ADMOBADS_LOGTAG, "executeDestroyBannerView");
         final CallbackContext delayCallback = callbackContext;
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -542,10 +553,50 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     }
 
     private void createInterstitialView(String _iid, AdMobAdsAdListener adListener) {
-        interstitialAd = new InterstitialAd(cordova.getActivity());
-        interstitialAd.setAdUnitId(_iid);
-        interstitialAd.setAdListener(adListener);
-        interstitialAd.loadAd(buildAdRequest());
+        InterstitialAd.load(cordova.getActivity(), _iid, buildAdRequest(), new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError _loadAdError) {
+                super.onAdFailedToLoad(_loadAdError);
+                interstitialAd = null;
+                adListener.onAdFailedToLoad(_loadAdError);
+            }
+
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd _interstitialAd) {
+                super.onAdLoaded(_interstitialAd);
+                interstitialAd = _interstitialAd;
+                interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdDismissedFullScreenContent() {
+                        super.onAdDismissedFullScreenContent();
+                        adListener.onAdClosed();
+                    }
+
+                    @Override
+                    public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                        super.onAdFailedToShowFullScreenContent(adError);
+                    }
+
+                    @Override
+                    public void onAdImpression() {
+                        super.onAdImpression();
+                    }
+
+                    @Override
+                    public void onAdShowedFullScreenContent() {
+                        super.onAdShowedFullScreenContent();
+                        adListener.onAdOpened();
+
+                    }
+                });
+                adListener.onAdLoaded();
+            }
+        });
     }
 
     private PluginResult executeCreateInterstitialView(JSONObject options, final CallbackContext callbackContext) {
@@ -566,21 +617,8 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         if (isInterstitialAvailable) {
             interstitialListener.onAdLoaded();
             callbackContext.success();
-
         } else {
-            this.setOptions(options);
-            if (interstitialAd == null) {
-                return executeCreateInterstitialView(options, callbackContext);
-
-            } else {
-                cordova.getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        interstitialAd.loadAd(buildAdRequest());
-                        callbackContext.success();
-                    }
-                });
-            }
+            return executeCreateInterstitialView(options, callbackContext);
         }
         return null;
     }
@@ -596,9 +634,9 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (interstitialAd.isLoaded()) {
+                if (interstitialAd != null) {
                     isInterstitialRequested = false;
-                    interstitialAd.show();
+                    interstitialAd.show(cordova.getActivity());
                 }
                 if (callbackContext != null) {
                     callbackContext.success();
@@ -613,12 +651,54 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     }
 
     private void createRewardedView(String _rid, AdMobAdsRewardedAdListener rewardedListener) {
-        rewardedAd = MobileAds.getRewardedVideoAdInstance(cordova.getActivity());
-        rewardedAd.setRewardedVideoAdListener(rewardedListener);
-        rewardedAd.loadAd(_rid, buildAdRequest());
+        RewardedAd.load(cordova.getActivity(), _rid, buildAdRequest(), new RewardedAdLoadCallback() {
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                super.onAdFailedToLoad(loadAdError);
+                rewardedAd = null;
+                rewardedListener.onRewardedVideoAdFailedToLoad(loadAdError.getCode());
+            }
+
+            @Override
+            public void onAdLoaded(@NonNull RewardedAd ad) {
+                super.onAdLoaded(ad);
+                rewardedAd = ad;
+                rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdDismissedFullScreenContent() {
+                        super.onAdDismissedFullScreenContent();
+                        rewardedAd = null;
+                        rewardedListener.onRewardedVideoAdClosed();
+                    }
+
+                    @Override
+                    public void onAdFailedToShowFullScreenContent(AdError adError) {
+                        super.onAdFailedToShowFullScreenContent(adError);
+                        rewardedAd = null;
+                    }
+
+                    @Override
+                    public void onAdImpression() {
+                        super.onAdImpression();
+                    }
+
+                    @Override
+                    public void onAdShowedFullScreenContent() {
+                        super.onAdShowedFullScreenContent();
+                        rewardedListener.onRewardedVideoAdOpened();
+                    }
+                });
+                rewardedListener.onRewardedVideoAdLoaded();
+            }
+        });
     }
 
-    private PluginResult executeCreateRewardedView(JSONObject options, final CallbackContext callbackContext) {
+    private PluginResult executeRequestRewardedAd(JSONObject options, final CallbackContext callbackContext) {
         this.setOptions(options);
         final String _rid = getRewardedId();
         cordova.getActivity().runOnUiThread(new Runnable() {
@@ -629,22 +709,6 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
                 callbackContext.success();
             }
         });
-        return null;
-    }
-
-    private PluginResult executeRequestRewardedAd(JSONObject options, final CallbackContext callbackContext) {
-        this.setOptions(options);
-        if (rewardedAd == null) {
-            return executeCreateRewardedView(options, callbackContext);
-        } else {
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rewardedAd.loadAd(rewardedAdId, buildAdRequest());
-                    callbackContext.success();
-                }
-            });
-        }
         return null;
     }
 
@@ -659,9 +723,14 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (rewardedAd.isLoaded()) {
+                if (rewardedAd != null) {
                     isRewardedRequested = false;
-                    rewardedAd.show();
+                    rewardedAd.show(cordova.getActivity(), new OnUserEarnedRewardListener() {
+                        @Override
+                        public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+                            rewardedListener.onRewarded(rewardItem);
+                        }
+                    });
                 }
                 if (callbackContext != null) {
                     callbackContext.success();
@@ -687,24 +756,14 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
                 if (isInterstitialAvailable) {
                     interstitialListener.onAdLoaded();
                 } else {
-                    if (interstitialAd == null) {
-                        final String _iid = getInterstitialId();
-                        cordova.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                isInterstitialRequested = true;
-                                createInterstitialView(_iid, interstitialListener);
-                            }
-                        });
-
-                    } else {
-                        cordova.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                interstitialAd.loadAd(buildAdRequest());
-                            }
-                        });
-                    }
+                    final String _iid = getInterstitialId();
+                    cordova.getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            isInterstitialRequested = true;
+                            createInterstitialView(_iid, interstitialListener);
+                        }
+                    });
                 }
             }
 
@@ -713,22 +772,13 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
                     rewardedListener.onRewardedVideoAdLoaded();
                 } else {
                     final String _rid = getRewardedId();
-                    if (rewardedAd == null) {
-                        cordova.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                isRewardedRequested = true;
-                                createRewardedView(_rid, rewardedListener);
-                            }
-                        });
-                    } else {
-                        cordova.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                rewardedAd.loadAd(_rid, buildAdRequest());
-                            }
-                        });
-                    }
+                    cordova.getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            isRewardedRequested = true;
+                            createRewardedView(_rid, rewardedListener);
+                        }
+                    });
                 }
             }
         }
@@ -756,25 +806,6 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         }
     }
 
-    public static final String md5(final String s) {
-        try {
-            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
-            digest.update(s.getBytes());
-            byte messageDigest[] = digest.digest();
-            StringBuilder hexString = new StringBuilder();
-            for (byte i : messageDigest) {
-                String h = Integer.toHexString(0xFF & i);
-                while (h.length() < 2) {
-                    h = "0" + h;
-                }
-                hexString.append(h);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-        }
-        return "";
-    }
-
     public static DisplayMetrics DisplayInfo(Context p_context) {
         DisplayMetrics metrics = null;
         try {
@@ -784,17 +815,5 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         } catch (Exception e) {
         }
         return metrics;
-    }
-
-    public static double DeviceInches(Context p_context) {
-        double default_value = 4.0f;
-        if (p_context == null)
-            return default_value;
-        try {
-            DisplayMetrics metrics = DisplayInfo(p_context);
-            return Math.sqrt(Math.pow(metrics.widthPixels / metrics.xdpi, 2.0) + Math.pow(metrics.heightPixels / metrics.ydpi, 2.0));
-        } catch (Exception e) {
-            return default_value;
-        }
     }
 }
