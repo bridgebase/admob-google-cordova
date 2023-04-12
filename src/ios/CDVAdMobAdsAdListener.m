@@ -49,17 +49,17 @@
 #pragma mark GADBannerViewDelegate implementation
 
 // onAdLoaded
-- (void)adViewDidReceiveAd:(GADBannerView *)adView {
+- (void)bannerViewDidReceiveAd:(GADBannerView *)bannerView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         NSString *jsString = [NSString stringWithFormat:
             @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdLoaded, { 'adType' : 'banner', 'adapter' : '%@' }); }, 1);", @"UNKNOWN"];
         [self.adMobAds.commandDelegate evalJs:jsString];
     }];
-    [adMobAds onBannerAd:adView adListener:self];
+    [adMobAds onBannerAd:bannerView adListener:self];
 }
 
 // onAdFailedToLoad
-- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(NSError *)error {
+- (void)bannerView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(NSError *)error {
     NSLog(@"%s: Failed to receive ad with error: %@",
           __PRETTY_FUNCTION__, [error localizedFailureReason]);
     
@@ -72,18 +72,6 @@
                                           (long)error.code,
                                           [self __getErrorReason:error.code]]];
     }];
-}
-
-- (void)adViewDidFailedToShow:(GADBannerView *)view {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        NSString *jsString =
-        @"setTimeout(function (){ cordova.fireDocumentEvent(admob.events.onAdFailedToLoad, "
-        @"{ 'adType' : 'banner', 'error': %ld, 'reason': '%@' }); }, 1);";
-        [self.adMobAds.commandDelegate evalJs:[NSString stringWithFormat:jsString,
-                                          0,
-                                          @"Advertising tracking may be disabled. To get test ads on this device, enable advertising tracking."]];
-    }];
-    
 }
 
 // onAdOpened
