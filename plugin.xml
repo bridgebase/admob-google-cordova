@@ -86,6 +86,9 @@
     <source-file src="src/ios/AppFeelReachability.m" />
     <!-- header-file src="src/ios/CDVAppFeelReachability.h" />
     <source-file src="src/ios/CDVAppFeelReachability.m" / -->
+    <hook type="before_plugin_install" src="scripts/update_pods.sh" />
+    <hook type="before_plugin_add" src="scripts/before_plugin_add.js" />
+    <hook type="before_plugin_install" src="scripts/before_plugin_install.js" />
 
     <!-- Frameworks -->
     <podspec>
